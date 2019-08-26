@@ -38,6 +38,7 @@ public class FileDownloadController {
             File file = new File(path.getAbsolutePath(), uploadFolder + fileName);
             if (file.exists()) {
                 response.setContentType("application/force-download");// 设置强制下载不打开
+                response.setHeader("Content-Length", ""+file.length());
                 // response.addHeader("Content-Disposition", "attachment;fileName=" +
                 // fileName);// 设置文件名
                 // response.setContentType("multipart/form-data;charset=UTF-8");也可以明确的设置一下UTF-8，测试中不设置也可以。
