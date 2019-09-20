@@ -34,6 +34,7 @@ public class TestController {
     @RequestMapping("/add")
     public String add(HttpServletRequest request) {
         Test t = new Test();
+        t.setId("112");
         t.setId("1");
         t.setName("张三啊修改了");
         testService.addMsg(t);
