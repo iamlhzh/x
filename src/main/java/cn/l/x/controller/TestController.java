@@ -35,7 +35,7 @@ public class TestController {
     public String add(HttpServletRequest request) {
         Test t = new Test();
         t.setId("1");
-        t.setName("张三");
+        t.setName("张三啊");
         testService.addMsg(t);
         return "OK";
     }
