@@ -35,7 +35,7 @@ public class TestController {
     public String add(HttpServletRequest request) {
         Test t = new Test();
         t.setId("1本地改保留");
-        t.setName("张三本地改去掉");
+        t.setName("张三git改保留");
         testService.addMsg(t);
         return "OK";
     }
