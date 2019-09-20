@@ -34,8 +34,8 @@ public class TestController {
     @RequestMapping("/add")
     public String add(HttpServletRequest request) {
         Test t = new Test();
-        t.setId("1git本地改");
-        t.setName("张三git改");
+        t.setId("1");
+        t.setName("张三");
         testService.addMsg(t);
         return "OK";
     }
