@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +31,16 @@ public class FileDownloadController {
     // 文件下载相关代码
     @RequestMapping("/downfile")
     public String downloadFile(String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String ip = getIpAddr(request);
+        System.out.println(ip);
+        // response.setHeader("Content-Disposition", "attachment;fileName=" + new
+        // String(fileName.getBytes("GB2312"), "ISO-8859-1"));
+        if (ip.equals("192.168.1.178")) {
+            // String stop = new String("禁止下载文件".getBytes("GB2312"), "ISO-8859-1");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().println("禁止下载文件");
+            return "禁止下载";
+        }
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
         if (!path.exists()) {
             path = new File("");
@@ -38,7 +50,7 @@ public class FileDownloadController {
             File file = new File(path.getAbsolutePath(), uploadFolder + fileName);
             if (file.exists()) {
                 response.setContentType("application/force-download");// 设置强制下载不打开
-                response.setHeader("Content-Length", ""+file.length());
+                response.setHeader("Content-Length", "" + file.length());
                 // response.addHeader("Content-Disposition", "attachment;fileName=" +
                 // fileName);// 设置文件名
                 // response.setContentType("multipart/form-data;charset=UTF-8");也可以明确的设置一下UTF-8，测试中不设置也可以。
@@ -78,4 +90,33 @@ public class FileDownloadController {
         }
         return "下载成功";
     }
+
+    private String getIpAddr(HttpServletRequest request) {
+        String ipAddress = request.getHeader("x-forwarded-for");
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+            if (ipAddress.equals("127.0.0.1") || ipAddress.equals("0:0:0:0:0:0:0:1")) {
+                InetAddress inet = null;
+                try {
+                    inet = InetAddress.getLocalHost();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                ipAddress = inet.getHostAddress();
+            }
+        }
+        if (ipAddress != null && ipAddress.length() > 15) { // "***.***.***.***".length()
+            if (ipAddress.indexOf(",") > 0) {
+                ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+            }
+        }
+        return ipAddress;
+    }
+
 }
