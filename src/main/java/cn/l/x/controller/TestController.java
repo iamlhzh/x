@@ -17,7 +17,7 @@ import cn.l.x.service.TestService;
 /**
  * 测试类。
  * 
- * @author 卢宏政啊啊
+ * @author 卢宏政去吧
  *
  */
 @RestController
