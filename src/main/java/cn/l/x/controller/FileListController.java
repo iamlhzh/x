@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,8 +28,74 @@ import cn.l.x.bean.Result;
 @RequestMapping("/fileList")
 public class FileListController {
 
-    @Value("${file.uploadFolder}")
-    private String uploadFolder;
+    @Value("${file.baseFileFolder}")
+    private String baseFileFolder;
+
+    /**
+     * 获取文件目录树。
+     * 
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     * @author 卢宏政
+     */
+    @ResponseBody
+    @RequestMapping("/getDirectoryList")
+    public Result getDirectoryList(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Result rst = new Result();
+        String ip = getIpAddr(request);
+        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        if (!path.exists()) {
+            path = new File("");
+        }
+        // 设置文件路径
+        File baseFile = new File(path.getAbsolutePath(), baseFileFolder);
+        FileInfo resultFileInfo = getAllDirectoryTree(baseFile);
+        List<FileInfo> returnList = new ArrayList<>();
+        returnList.add(resultFileInfo);
+        rst.setObj(returnList);
+
+        return rst;
+    }
+
+    private FileInfo getAllDirectoryTree(File baseFile) {
+        FileInfo resultFileInfo = new FileInfo();
+        resultFileInfo.setFile(baseFile);
+        resultFileInfo.setFileName(baseFile.getName());
+        resultFileInfo.setIsDirectory(baseFile.isDirectory());
+        resultFileInfo.setFileSize(baseFile.length());
+        resultFileInfo.setFileUrl(baseFile.getPath());
+        if (resultFileInfo.getIsDirectory()) {
+            getSubDirectory(resultFileInfo);
+        }
+        return resultFileInfo;
+    }
+
+    private void getSubDirectory(FileInfo resultFileInfo) {
+        File[] listFiles = resultFileInfo.getFile().listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+        for (File file : listFiles) {
+            if (file.isDirectory()) {
+                FileInfo fileInfo = new FileInfo();
+                fileInfo.setFile(file);
+                fileInfo.setFileName(file.getName());
+                fileInfo.setIsDirectory(file.isDirectory());
+                fileInfo.setFileSize(file.length());
+                fileInfo.setFileAbsolutePath(file.getAbsolutePath());
+                fileList.add(fileInfo);
+            }
+        }
+        if (!CollectionUtils.isEmpty(fileList)) {
+            resultFileInfo.setChildrenFileList(fileList);
+            for (FileInfo fileInfo : resultFileInfo.getChildrenFileList()) {
+                if (fileInfo.getIsDirectory()) {
+                    getSubDirectory(fileInfo);
+                }
+            }
+        }
+
+    }
 
     // 文件下载相关代码
     @ResponseBody
@@ -41,7 +108,7 @@ public class FileListController {
             path = new File("");
         }
         // 设置文件路径
-        File baseFile = new File(path.getAbsolutePath(), uploadFolder);
+        File baseFile = new File(path.getAbsolutePath(), baseFileFolder);
         FileInfo resultFileInfo = getAllFileTree(baseFile);
         List<FileInfo> returnList = new ArrayList<>();
         returnList.add(resultFileInfo);

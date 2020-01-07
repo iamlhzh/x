@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -19,14 +20,126 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import cn.l.x.bean.Result;
 
 @Controller
-@RequestMapping("/file")
-public class FileDownloadController {
+@RequestMapping("/upLoad")
+public class FileUploadController {
 
     @Value("${file.baseFileFolder}")
     private String baseFileFolder;
+
+    @ResponseBody
+    @PostMapping(value = "/upLoadFile")
+    public Result uploadFile(@RequestParam("fileDirectory") String fileDirectory, @RequestParam("filename") MultipartFile file) {
+        Result rst = new Result();
+        if (file.isEmpty()) {
+            rst.setCode("003");
+            rst.setMsg("未接收到任何文件");
+        } else {
+            System.out.println(fileDirectory);
+            System.out.println(file.getOriginalFilename());
+            System.out.println(file.getSize());
+        }
+        try {
+            File path = new File(ResourceUtils.getURL("classpath:").getPath());
+
+            File baseDirectory = new File(path, baseFileFolder);
+            File toDirectory = new File(baseDirectory, fileDirectory);
+
+            System.out.println(toDirectory.getAbsolutePath());
+            System.out.println(toDirectory.exists());
+            boolean existDircetory = false;
+            if (toDirectory.exists()) {
+                existDircetory = true;
+            } else {
+                existDircetory = toDirectory.mkdirs();
+            }
+            if (existDircetory) {
+                File saveFile = new File(toDirectory, file.getOriginalFilename());
+                file.transferTo(saveFile);
+                rst.setMsg("文件上传成功");
+            }
+        } catch (Exception e) {
+            rst.setCode("008");
+            rst.setMsg("文件上传失败");
+        }
+        return rst;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "/upLoadFileList")
+    public Result uploadFileList(@RequestParam("fileDirectory") String fileDirectory, @RequestParam("fileList") MultipartFile[] fileList) {
+        Result rst = new Result();
+        if (Array.getLength(fileList) == 0) {
+            rst.setCode("003");
+            rst.setMsg("未接收到任何文件");
+        } else {
+            System.out.println(fileDirectory);
+            System.out.println(fileList.length);
+        }
+        try {
+            File path = new File(ResourceUtils.getURL("classpath:").getPath());
+
+            File baseDirectory = new File(path, baseFileFolder);
+            File toDirectory = new File(baseDirectory, fileDirectory);
+
+            System.out.println(toDirectory.getAbsolutePath());
+            System.out.println(toDirectory.exists());
+            boolean existDircetory = false;
+            if (toDirectory.exists()) {
+                existDircetory = true;
+            } else {
+                existDircetory = toDirectory.mkdirs();
+            }
+            if (existDircetory) {
+                for (MultipartFile file : fileList) {
+                    File saveFile = new File(toDirectory, file.getOriginalFilename());
+                    file.transferTo(saveFile);
+                }
+                rst.setMsg("文件上传成功");
+            }
+        } catch (Exception e) {
+            rst.setCode("008");
+            rst.setMsg("文件上传失败");
+        }
+        return rst;
+    }
+
+    // @RequestMapping("/upLoadFile")
+    // public void uploadFile(@RequestParam File file) throws IOException {
+    // System.out.println(1111111);
+    // // InputStream in = file.getInputStream();
+    // // byte[] data = null;
+    // // try {
+    // // ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
+    // // byte[] buff = new byte[in.available()];
+    // // int rc = 0;
+    // // while ((rc = in.read(buff, 0, 100)) > 0) {
+    // // swapStream.write(buff, 0, rc);
+    // // }
+    // // data = swapStream.toByteArray();
+    // // } catch (IOException e) {
+    // // e.printStackTrace();
+    // // } finally {
+    // // if (in != null) {
+    // // try {
+    // // in.close();
+    // // } catch (IOException e) {
+    // // e.printStackTrace();
+    // // }
+    // // }
+    // // }
+    // // String str = new String(Base64.encodeBase64(data));
+    // // //下面就存数据库啦
+    // // service.update（id,str);
+    // }
 
     // 文件下载相关代码
     @RequestMapping("/downfileByAbsolutePath")
