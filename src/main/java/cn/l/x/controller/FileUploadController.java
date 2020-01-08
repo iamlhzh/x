@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,8 +47,8 @@ public class FileUploadController {
             System.out.println(file.getSize());
         }
         try {
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-
+            String filePath = System.getProperty("user.dir");
+            File path = new File(filePath);
             File baseDirectory = new File(path, baseFileFolder);
             File toDirectory = new File(baseDirectory, fileDirectory);
 
@@ -85,8 +84,8 @@ public class FileUploadController {
             System.out.println(fileList.length);
         }
         try {
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-
+            String filePath = System.getProperty("user.dir");
+            File path = new File(filePath);
             File baseDirectory = new File(path, baseFileFolder);
             File toDirectory = new File(baseDirectory, fileDirectory);
 
@@ -108,6 +107,7 @@ public class FileUploadController {
         } catch (Exception e) {
             rst.setCode("008");
             rst.setMsg("文件上传失败");
+            System.out.println(e);
         }
         return rst;
     }
@@ -198,7 +198,8 @@ public class FileUploadController {
     public String downloadFile(String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String ip = getIpAddr(request);
         System.out.println(ip);
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        String filePath = System.getProperty("user.dir");
+        File path = new File(filePath);
         if (!path.exists()) {
             path = new File("");
         }

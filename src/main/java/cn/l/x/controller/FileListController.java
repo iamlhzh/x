@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -45,7 +44,10 @@ public class FileListController {
     public Result getDirectoryList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Result rst = new Result();
         String ip = getIpAddr(request);
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        String filePath = System.getProperty("user.dir");
+        System.out.println(filePath);
+        File path = new File(filePath);
+        System.out.println(path.getAbsolutePath());
         if (!path.exists()) {
             path = new File("");
         }
@@ -103,7 +105,9 @@ public class FileListController {
     public Result getFileList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Result rst = new Result();
         String ip = getIpAddr(request);
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        System.out.println(ip);
+        String filePath = System.getProperty("user.dir");
+        File path = new File(filePath);
         if (!path.exists()) {
             path = new File("");
         }

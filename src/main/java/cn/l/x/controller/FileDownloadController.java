@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -85,7 +84,8 @@ public class FileDownloadController {
     public String downloadFile(String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String ip = getIpAddr(request);
         System.out.println(ip);
-        File path = new File(ResourceUtils.getURL("classpath:").getPath());
+        String filePath = System.getProperty("user.dir");
+        File path = new File(filePath);
         if (!path.exists()) {
             path = new File("");
         }
