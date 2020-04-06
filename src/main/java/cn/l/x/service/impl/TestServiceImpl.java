@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import cn.l.x.bean.AdminUser;
 import cn.l.x.bean.Test;
 import cn.l.x.dao.TestDao;
 import cn.l.x.service.TestService;
@@ -23,5 +24,11 @@ public class TestServiceImpl implements TestService {
         System.out.println("1111111111111111111111111");
         testDao.add(t);
 
+    }
+
+    @Override
+    public void addAdminUser(AdminUser adu) {
+
+        testDao.addAdminUser(adu);
     }
 }

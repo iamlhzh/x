@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.l.x.bean.AdminUser;
 import cn.l.x.bean.Test;
 import cn.l.x.service.TestService;
 
@@ -37,6 +38,16 @@ public class TestController {
         t.setId("1");
         t.setName("张三");
         testService.addMsg(t);
+        return "OK";
+    }
+
+    @RequestMapping("/addAdminUser")
+    public String addAdminUser(HttpServletRequest request) {
+        AdminUser adu = new AdminUser();
+        adu.setId("11");
+        adu.setLoginName("lhzh");
+        adu.setRealName("卢宏政");
+        testService.addAdminUser(adu);
         return "OK";
     }
 

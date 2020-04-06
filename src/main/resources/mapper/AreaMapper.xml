@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.l.x.dao.AreaDao" >
+	<insert id="addArea" >
+		INSERT INTO zhengwugongkai.acc_district (
+		id,
+		district_name,
+		district_level,
+		pid,
+		version
+		) values
+		<foreach collection="list" item="var" index="list"
+			separator=",">
+			(
+			#{var.code,jdbcType=VARCHAR},
+			#{var.name,jdbcType=VARCHAR},
+			#{var.level,jdbcType=INTEGER},
+			#{var.pcode,jdbcType=VARCHAR},
+			0
+			)
+		</foreach>
+	</insert>
+	
+	<insert id="addAdminUser" parameterType="cn.l.x.bean.AdminUser">
+		INSERT INTO `pl_enzyme`.`tb_admin_user` (`id`, `login_name`,`real_name`) VALUES (#{id}, #{loginName},#{realName})
+	</insert>
+	
+</mapper>
