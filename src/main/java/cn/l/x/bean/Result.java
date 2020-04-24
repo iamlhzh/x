@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
  * @author 马岳
  *
  */
-public class Result implements Serializable {
+public class Result<T> implements Serializable {
     /**
      * 序列化版本号。
      */
@@ -34,7 +34,7 @@ public class Result implements Serializable {
     /**
      * 返回对象(具体类型参照具体的HTTP请求)。
      */
-    private Object obj;
+    private T t;
 
     /**
      * 默认构造函数。
@@ -69,10 +69,10 @@ public class Result implements Serializable {
      * @param msg 返回消息。
      * @param obj 返回对象。
      */
-    public Result(String code, String msg, Object obj) {
+    public Result(String code, String msg, T t) {
         this.code = code;
         this.msg = msg;
-        this.obj = obj;
+        this.t = t;
     }
 
     /**
@@ -111,10 +111,6 @@ public class Result implements Serializable {
         return msg;
     }
 
-    public Object getObj() {
-        return obj;
-    }
-
     public void setCode(String code) {
         this.code = code;
     }
@@ -127,12 +123,12 @@ public class Result implements Serializable {
         this.msg = msg;
     }
 
-    public void setObj(Object obj) {
-        this.obj = obj;
+    public T getObj() {
+        return t;
     }
 
-    @Override
-    public String toString() {
-        return "code->" + code + ",msg->" + msg + ",obj->" + obj;
+    public void setObj(T t) {
+        this.t = t;
     }
+
 }
