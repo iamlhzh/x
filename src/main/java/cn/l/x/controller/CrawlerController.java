@@ -34,7 +34,7 @@ public class CrawlerController {
     private static final String pattern = singlePattern + singlePattern + singlePattern + singlePattern;
 
     // FFmpeg全路径
-    private static final String FFMPEG_PATH = "C:\\ffmpeg-20200403-52523b6-win64-static\\bin\\ffmpeg.exe";
+    private static final String FFMPEG_PATH = "ffmpeg";
 
     private static Integer limitNum = 50;
 

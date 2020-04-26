@@ -51,7 +51,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private static Integer limitNum = 50;
 
-    private static final String FFMPEG_PATH = "C:\\ffmpeg-20200403-52523b6-win64-static\\bin\\ffmpeg.exe";
+    private static final String FFMPEG_PATH = "ffmpeg";
 
     // = "https://www.icourse163.org/course/PKU-1002530002";
 
