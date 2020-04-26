@@ -45,13 +45,30 @@ public class CrawlerController {
     @RequestMapping("/crawlerCourse")
     public Result crawlerCourse(String schoolCourseId, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Result<Course> rst = new Result<>();
-        // 第一步根据前台传来的ID获取课程基本信息(courseName和TermList)
-        rst = crawlerService.getCourseInfoBySchoolCourseId(schoolCourseId);
+        if (DataUtils.isNull(schoolCourseId)) {
+            rst.equals(Messages.E0002);
+        }
+        // 获取课程基本信息
+        if (rst.isSucceeded()) {
+            // 第一步根据前台传来的ID获取课程基本信息(courseName和TermList)
+            rst = crawlerService.getCourseInfoBySchoolCourseId(schoolCourseId);
+        }
+        // 获取课程详细信息
         if (rst.isSucceeded()) {
             Course course = rst.getObj();
-            if (DataUtils.isNotNull(course.getCourseName()) && CollectionUtils.isEmpty(course.getTermList())) {
+            if (DataUtils.isNotNull(course) && DataUtils.isNotNull(course.getCourseName()) && !CollectionUtils.isEmpty(course.getTermList())) {
                 // 根据course基本信息获取详细信息
                 rst = crawlerService.getCourseDetailByCourse(course);
+            } else {
+                rst.setCodeMsg(Messages.E0002);
+            }
+        }
+        // 下载信息
+        if (rst.isSucceeded()) {
+            Course course = rst.getObj();
+            if (DataUtils.isNotNull(course) && DataUtils.isNotNull(course.getCourseName()) && !CollectionUtils.isEmpty(course.getChapters())) {
+                // 根据课程详细信息下载相关文件
+                rst = crawlerService.downloadFileByCourse(course);
             } else {
                 rst.setCodeMsg(Messages.E0002);
             }

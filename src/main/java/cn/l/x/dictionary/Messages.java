@@ -27,9 +27,9 @@ public interface Messages extends CommonMessages {
     CodeMessage E0002 = MessageBuilder.INSTANCE.error(2, "缺乏必要参数");
 
     /**
-     * 【政务附件上传】附件大小超过限制。
+     * 【爬虫】获取课程详细信息失败。
      */
-    CodeMessage E0003 = MessageBuilder.INSTANCE.error(3, "附件大小超过限制");
+    CodeMessage E0003 = MessageBuilder.INSTANCE.error(3, "获取课程详细信息失败");
 
     /**
      * 【政务信息保存】政务信息主表保存失败。

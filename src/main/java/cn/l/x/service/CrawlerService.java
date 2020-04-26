@@ -5,6 +5,8 @@
 
 package cn.l.x.service;
 
+import javax.script.ScriptException;
+
 import cn.l.x.base.Result;
 import cn.l.x.bean.Course;
 
@@ -12,6 +14,8 @@ public interface CrawlerService {
 
     Result<Course> getCourseInfoBySchoolCourseId(String schoolCourseId);
 
-    Result<Course> getCourseDetailByCourse(Course course);
+    Result<Course> getCourseDetailByCourse(Course course) throws ScriptException;
+
+    Result<Course> downloadFileByCourse(Course course);
 
 }
