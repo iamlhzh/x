@@ -28,7 +28,8 @@ public class HtmlUtil {
         String title = "";
 
         // Pattern pa = Pattern.compile("<title>.*?</title>", Pattern.CANON_EQ);也可以
-        Pattern pa = Pattern.compile("<title>.*?</title>");// 源码中标题正则表达式
+//        Pattern pa = Pattern.compile("<title>.*?</title>");// 源码中标题正则表达式
+        Pattern pa = Pattern.compile("<title>[\\s\\S]*?\n</title>");// 源码中标题正则表达式
         Matcher ma = pa.matcher(htmlSource);
         while (ma.find())// 寻找符合el的字串
         {
@@ -47,7 +48,7 @@ public class HtmlUtil {
      * @return
      */
     public static String outTag(String s) {
-        return s.replaceAll("<.*?>", "");
+        return s.replaceAll("<.*?>", "").replaceAll("\r|\n", "");
     }
 
     public static List<Term> getTermByHtml(String html) {

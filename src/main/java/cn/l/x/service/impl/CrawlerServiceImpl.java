@@ -262,19 +262,19 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private static void toDownLoadTs(String baseUrl, List<String> tsList, File toDirectory, String videoName) {
         List<String> filePaths = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        sb.append("cmd /c dir ");
-        sb.append(FFMPEG_PATH);
-        sb.append(" -i ");
-        sb.append("\"concat:");
+        // StringBuilder sb = new StringBuilder();
+        // sb.append("cmd /c dir ");
+        // sb.append(FFMPEG_PATH);
+        // sb.append(" -i ");
+        // sb.append("\"concat:");
         for (String tsStr : tsList) {
             String allUrl = baseUrl + "/" + tsStr;
             File tsFile = new File(toDirectory, tsStr);
             if (!tsFile.exists()) {
                 HttpRequest.downLoad(allUrl, tsFile);
-                sb.append(tsFile.getAbsolutePath());
+                // sb.append(tsFile.getAbsolutePath());
                 filePaths.add(tsFile.getAbsolutePath());
-                sb.append("|");
+                // sb.append("|");
             }
         }
         toMergeAllFile(filePaths, toDirectory, videoName);
