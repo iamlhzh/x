@@ -69,7 +69,7 @@ public class CrawlerServiceImpl implements CrawlerService {
             // 获取课程名称
             String courseName = HtmlUtil.getCourseNameByHtml(html);
             if (DataUtils.isNotNull(courseName)) {
-                c.setCourseName(courseName);
+                c.setCourseName(courseName.replaceAll("\\(", "（").replaceAll("\\)", "）").replaceAll(" ", "_"));
             }
             // // 新建一个文件夹
             // String filePath = System.getProperty("user.dir");
@@ -148,7 +148,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         String filePath = System.getProperty("user.dir");
         File path = new File(filePath);
         File baseDirectory = new File(path, baseFileFolder);
-        File courseDirectory = new File(baseDirectory, course.getCourseName().replace(" ", ""));
+        File courseDirectory = new File(baseDirectory, course.getCourseName());
         boolean existDircetory = false;
         if (courseDirectory.exists()) {
             existDircetory = true;
@@ -162,7 +162,8 @@ public class CrawlerServiceImpl implements CrawlerService {
         while (iterator.hasNext()) {
             // 一个章节
             Chapter chapter = iterator.next().getValue();
-            File toDirectory = new File(courseDirectory, chapter.getName().replace(" ", ""));
+            chapter.setName(chapter.getName().replaceAll(" ", "_").replaceAll("\\(", "（").replaceAll("\\)", "）"));
+            File toDirectory = new File(courseDirectory, chapter.getName());
             boolean chapterDircetory = false;
             if (toDirectory.exists()) {
                 chapterDircetory = true;
@@ -202,7 +203,7 @@ public class CrawlerServiceImpl implements CrawlerService {
                                 JSONObject parseResult = JSON.parseObject(object.toString());
                                 Object videos = parseResult.get("videos");
                                 System.out.println(parseResult.get("name"));
-                                String videoName = parseResult.get("name").toString();
+                                String videoName = parseResult.get("name").toString().replaceAll(" ", "_").replaceAll("\\(", "（").replaceAll("\\)", "）");
                                 List<Video> parseArray = JSON.parseArray(videos.toString(), Video.class);
                                 boolean flag = false;
                                 List<String> tsList = new ArrayList<>();
@@ -246,7 +247,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
                                 }
                                 // 去下载ts文件
-                                File file = new File(toDirectory, videoName.replace(" ", ""));
+                                File file = new File(toDirectory, videoName);
                                 if (!file.exists()) {
                                     toDownLoadTs(baseUrl, tsList, toDirectory, videoName);
                                 }
@@ -319,7 +320,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private static String toCombine(File toDirectory, List<String> sub, String fileName) {
         StringBuilder sb = new StringBuilder();
-        File file = new File(toDirectory, fileName.replace(" ", ""));
+        File file = new File(toDirectory, fileName.replace(" ", "_"));
         if (file.exists()) {
             file.delete();
         }
@@ -331,9 +332,10 @@ public class CrawlerServiceImpl implements CrawlerService {
             sb.append(tsStr);
             sb.append("|");
         }
-        sb.append("\" -c copy ").append(file.getAbsolutePath().replace(" ", ""));
+        sb.append("\" -c copy ").append(file.getAbsolutePath().replace(" ", "_"));
         Process p = null;
         try {
+        	System.out.println("执行的命令是："+sb.toString());
             p = Runtime.getRuntime().exec(sb.toString());
             p.waitFor();
         } catch (Exception e) {
