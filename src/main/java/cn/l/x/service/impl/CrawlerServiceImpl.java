@@ -43,7 +43,8 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     private static final String chineseParentheses="（";
 
-    private static final String FFMPEG_PATH = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
+//    private static final String FFMPEG_PATH = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
+    private static final String FFMPEG_PATH = "ffmpeg";
 
     // = "https://www.icourse163.org/course/PKU-1002530002";
 
