@@ -5,41 +5,25 @@
 
 package cn.l.x.service.impl;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
 import cn.l.x.base.Result;
-import cn.l.x.bean.Chapter;
-import cn.l.x.bean.Course;
-import cn.l.x.bean.Lesson;
-import cn.l.x.bean.PostResult;
-import cn.l.x.bean.Term;
-import cn.l.x.bean.Unit;
-import cn.l.x.bean.Video;
-import cn.l.x.bean.VideoResult;
-import cn.l.x.bean.VideoSignDto;
+import cn.l.x.bean.*;
 import cn.l.x.dictionary.Messages;
 import cn.l.x.service.CrawlerService;
 import cn.l.x.utils.DataUtils;
 import cn.l.x.utils.HtmlUtil;
 import cn.l.x.utils.HttpRequest;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
 
 @Service
 public class CrawlerServiceImpl implements CrawlerService {
@@ -47,11 +31,11 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Value("${crawler.baseHostUrl}")
     private String baseHostUrl;
 
-    private static String baseFileFolder = "static/file/";
+    private static final String baseFileFolder = "static/file/";
 
-    private static Integer limitNum = 50;
+    private static final Integer limitNum = 50;
 
-    private static final String FFMPEG_PATH = "ffmpeg";
+    private static final String FFMPEG_PATH = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
 
     // = "https://www.icourse163.org/course/PKU-1002530002";
 
@@ -335,8 +319,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         sb.append("\" -c copy ").append(file.getAbsolutePath().replace(" ", "_"));
         Process p = null;
         try {
-        	System.out.println("执行的命令是："+sb.toString());
-            p = Runtime.getRuntime().exec(sb.toString());
+            p = Runtime.getRuntime().exec(new String[]{"sh", "-c", sb.toString()});
             p.waitFor();
         } catch (Exception e) {
             System.out.println(e.toString());

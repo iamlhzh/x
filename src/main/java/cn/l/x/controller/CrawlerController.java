@@ -5,27 +5,26 @@
 
 package cn.l.x.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import cn.l.x.base.Result;
+import cn.l.x.bean.Course;
+import cn.l.x.dictionary.Messages;
+import cn.l.x.service.CrawlerService;
+import cn.l.x.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cn.l.x.base.Result;
-import cn.l.x.bean.Course;
-import cn.l.x.dictionary.Messages;
-import cn.l.x.service.CrawlerService;
-import cn.l.x.utils.DataUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @ResponseBody
 @RequestMapping("/crawler")
 public class CrawlerController {
 
-    private static String baseFileFolder = "static/file/";
+    private static final String baseFileFolder = "static/file/";
 
     static int i;
     // 单个字符的正则表达式
@@ -36,7 +35,7 @@ public class CrawlerController {
     // FFmpeg全路径
     private static final String FFMPEG_PATH = "ffmpeg";
 
-    private static Integer limitNum = 50;
+    private static final Integer limitNum = 50;
 
     @Autowired
     private CrawlerService crawlerService;
@@ -76,4 +75,5 @@ public class CrawlerController {
         return rst;
 
     }
+
 }
