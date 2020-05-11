@@ -30,10 +30,18 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     @Value("${crawler.baseHostUrl}")
     private String baseHostUrl;
-
+    /**
+     * 临时文件存放处
+     */
+    private static final String baseTempFolder = "static/temp/";
+    /**
+     * 存放文件处
+     */
     private static final String baseFileFolder = "static/file/";
 
     private static final Integer limitNum = 50;
+
+    private static final String chineseParentheses="（";
 
     private static final String FFMPEG_PATH = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
 
@@ -53,19 +61,8 @@ public class CrawlerServiceImpl implements CrawlerService {
             // 获取课程名称
             String courseName = HtmlUtil.getCourseNameByHtml(html);
             if (DataUtils.isNotNull(courseName)) {
-                c.setCourseName(courseName.replaceAll("\\(", "（").replaceAll("\\)", "）").replaceAll(" ", "_"));
+                c.setCourseName(courseName.replaceAll("\\(", chineseParentheses).replaceAll("\\)", "）").replaceAll(" ", "_"));
             }
-            // // 新建一个文件夹
-            // String filePath = System.getProperty("user.dir");
-            // File path = new File(filePath);
-            // File baseDirectory = new File(path, baseFileFolder);
-            // File toDirectory = new File(baseDirectory, courseName);
-            // boolean existDircetory = false;
-            // if (toDirectory.exists()) {
-            // existDircetory = true;
-            // } else {
-            // existDircetory = toDirectory.mkdirs();
-            // }
             // 获取课程的信息；可能有多个但是他们的termId是一样的
             List<Term> termList = HtmlUtil.getTermByHtml(html);
             if (!CollectionUtils.isEmpty(termList)) {
@@ -133,11 +130,12 @@ public class CrawlerServiceImpl implements CrawlerService {
         File path = new File(filePath);
         File baseDirectory = new File(path, baseFileFolder);
         File courseDirectory = new File(baseDirectory, course.getCourseName());
-        boolean existDircetory = false;
-        if (courseDirectory.exists()) {
-            existDircetory = true;
-        } else {
-            existDircetory = courseDirectory.mkdirs();
+        File tempDirectory = new File(path, baseTempFolder);
+        if(!tempDirectory.exists()){
+            tempDirectory.mkdirs();
+        }
+        if (!courseDirectory.exists()) {
+            courseDirectory.mkdirs();
         }
         // 一门课程的所有章节
         Map<String, Chapter> chapters = course.getChapters();
@@ -146,13 +144,10 @@ public class CrawlerServiceImpl implements CrawlerService {
         while (iterator.hasNext()) {
             // 一个章节
             Chapter chapter = iterator.next().getValue();
-            chapter.setName(chapter.getName().replaceAll(" ", "_").replaceAll("\\(", "（").replaceAll("\\)", "）"));
+            chapter.setName(chapter.getName().replaceAll(" ", "_").replaceAll("\\(", chineseParentheses).replaceAll("\\)", "）"));
             File toDirectory = new File(courseDirectory, chapter.getName());
-            boolean chapterDircetory = false;
-            if (toDirectory.exists()) {
-                chapterDircetory = true;
-            } else {
-                chapterDircetory = toDirectory.mkdirs();
+            if (!toDirectory.exists()) {
+                toDirectory.mkdirs();
             }
             // System.out.println(chapter);
             // 一个章节的所有课
@@ -187,7 +182,7 @@ public class CrawlerServiceImpl implements CrawlerService {
                                 JSONObject parseResult = JSON.parseObject(object.toString());
                                 Object videos = parseResult.get("videos");
                                 System.out.println(parseResult.get("name"));
-                                String videoName = parseResult.get("name").toString().replaceAll(" ", "_").replaceAll("\\(", "（").replaceAll("\\)", "）");
+                                String videoName = parseResult.get("name").toString().replaceAll(" ", "_").replaceAll("\\(", chineseParentheses).replaceAll("\\)", "）");
                                 List<Video> parseArray = JSON.parseArray(videos.toString(), Video.class);
                                 boolean flag = false;
                                 List<String> tsList = new ArrayList<>();
@@ -233,7 +228,7 @@ public class CrawlerServiceImpl implements CrawlerService {
                                 // 去下载ts文件
                                 File file = new File(toDirectory, videoName);
                                 if (!file.exists()) {
-                                    toDownLoadTs(baseUrl, tsList, toDirectory, videoName);
+                                    toDownLoadTs(baseUrl, tsList,tempDirectory, toDirectory, videoName);
                                 }
                             }
                         }
@@ -245,7 +240,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         return null;
     }
 
-    private static void toDownLoadTs(String baseUrl, List<String> tsList, File toDirectory, String videoName) {
+    private static void toDownLoadTs(String baseUrl, List<String> tsList, File tempDirectory, File toDirectory, String videoName) {
         List<String> filePaths = new ArrayList<>();
         // StringBuilder sb = new StringBuilder();
         // sb.append("cmd /c dir ");
@@ -254,7 +249,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         // sb.append("\"concat:");
         for (String tsStr : tsList) {
             String allUrl = baseUrl + "/" + tsStr;
-            File tsFile = new File(toDirectory, tsStr);
+            File tsFile = new File(tempDirectory, tsStr);
             if (!tsFile.exists()) {
                 HttpRequest.downLoad(allUrl, tsFile);
                 // sb.append(tsFile.getAbsolutePath());
@@ -319,7 +314,8 @@ public class CrawlerServiceImpl implements CrawlerService {
         sb.append("\" -c copy ").append(file.getAbsolutePath().replace(" ", "_"));
         Process p = null;
         try {
-            p = Runtime.getRuntime().exec(new String[]{"sh", "-c", sb.toString()});
+//            p = Runtime.getRuntime().exec(new String[]{"sh", "-c", sb.toString()});
+            p = Runtime.getRuntime().exec(sb.toString());
             p.waitFor();
         } catch (Exception e) {
             System.out.println(e.toString());
