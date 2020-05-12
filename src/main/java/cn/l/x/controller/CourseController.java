@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,7 @@ public class CourseController {
 
     // 爬取视频
     @RequestMapping("/getAllCourse")
-    public Result getAllCourse(SchoolCourseQuery SchoolCourseQuery, HttpServletRequest request, HttpServletResponse response) {
+    public Result getAllCourse(@RequestBody SchoolCourseQuery SchoolCourseQuery, HttpServletRequest request, HttpServletResponse response) {
         System.out.println(SchoolCourseQuery);
         String url=HOSTURL+SchoolCourseQuery.getAbbreviation();
         String schoolId=schoolService.getSchoolIdByAbbreviation(url);
