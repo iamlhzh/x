@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.l.x.bean.School;
 import com.alibaba.fastjson.JSON;
 
 import cn.l.x.bean.Term;
@@ -156,4 +157,53 @@ public class HtmlUtil {
         return tsList;
 
     }
+
+    public static List<School> getSchoolList(String sendGet) {
+        String reg = "<a[\\s]*class=\"u-usity[\\s]*f-fl\"[\\s\\S\n]*?</a>";
+        List<School> schoolList = new ArrayList<>();
+        Matcher m = Pattern.compile(reg).matcher(sendGet);
+        System.out.println(m.groupCount());
+        while (m.find()) {
+            String info = m.group(0);
+             System.out.println(info);
+             School school=getSchoolByStr(info);
+             schoolList.add(school);
+            // String allUrl=baseUrl+"/"+info.substring(1);
+            // HttpRequest.downLoad(allUrl);
+        }
+        return schoolList;
+    }
+
+    private static School getSchoolByStr(String info) {
+        //获取某一项后面的值
+        School school=new School();
+        school.setAbbreviation(getItemByStr(info,"href"));
+        school.setImgUrl(getItemByStr(info,"src"));
+        school.setName(getItemByStr(info,"alt"));
+        return school;
+    }
+
+    public static String getItemByStr(String info, String item) {
+        String reg = item+"[\\s]*=[\\s]*\"[\\s\\S\n]*?\"";
+        String returnStr=null;
+        Matcher m = Pattern.compile(reg).matcher(info);
+        System.out.println(m.groupCount());
+        if (m.find()) {
+            String value = m.group();
+            returnStr=value.substring(value.indexOf("=")+1).trim();
+        }
+        return returnStr.substring(1,returnStr.length()-1);
+    }
+
+//    public static String getSchoolId(String sendGet) {
+//        String reg = "window.schoolId[\\s]*=[\\s]*\"=[\\s\\S\n]*?\"";
+//        String returnStr=null;
+//        Matcher m = Pattern.compile(reg).matcher(sendGet);
+//        System.out.println(m.groupCount());
+//        if (m.find()) {
+//            String value = m.group();
+//            returnStr=value.substring(value.indexOf("=")+1).trim();
+//        }
+//        return returnStr;
+//    }
 }

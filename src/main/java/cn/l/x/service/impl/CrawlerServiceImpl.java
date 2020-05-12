@@ -90,7 +90,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         String sendPost = null;
         if (DataUtils.isNotNull(tid)) {
             String url = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getLastLearnedMocTermDto.dwr";
-            String param = "callCount=1&scriptSessionId=${scriptSessionId}190&httpSessionId=b2dc9c47194e4e97a711b7bde5e281b2&c0-scriptName=CourseBean&c0-methodName=getLastLearnedMocTermDto&c0-id=0&c0-param0=number:"
+            String param = "callCount=1&scriptSessionId=${scriptSessionId}190&httpSessionId=b2dc9c47194e4e97a711b7bde5e281b7&c0-scriptName=CourseBean&c0-methodName=getLastLearnedMocTermDto&c0-id=0&c0-param0=number:"
                     + tid + "&batchId=1585985756309";
             sendPost = HttpRequest.sendPost(url, param);
         } else {
@@ -337,9 +337,10 @@ public class CrawlerServiceImpl implements CrawlerService {
     }
 
     private VideoSignDto getVideoSignDtoByUnitId(String id) {
-        String url = "https://www.icourse163.org/web/j/resourceRpcBean.getResourceToken.rpc?csrfKey=b2dc9c47194e4e97a711b7bde5e281b2";
+        String url = "https://www.icourse163.org/web/j/resourceRpcBean.getResourceToken.rpc?csrfKey=b2dc9c47194e4e97a711b7bde5e281b7";
         String param = "bizId=" + id + "&bizType=1&contentType=1";
-        String sendPost = HttpRequest.sendMyPost(url, param);
+        String cookie="NTESSTUDYSI=b2dc9c47194e4e97a711b7bde5e281b7";
+        String sendPost = HttpRequest.sendMyPost(url, param,cookie);
         VideoSignDto videoSignDto = null;
         if (sendPost != "") {
             // System.out.println(sendPost);
