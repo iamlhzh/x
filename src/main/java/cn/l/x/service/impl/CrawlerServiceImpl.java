@@ -33,20 +33,27 @@ public class CrawlerServiceImpl implements CrawlerService {
     /**
      * 临时文件存放处
      */
-    private static final String baseTempFolder = "static/temp/";
+    @Value("${crawler.baseTempFolder}")
+    private  String baseTempFolder ;
     /**
      * 存放文件处
      */
-    private static final String baseFileFolder = "static/file/";
+    @Value("${crawler.baseFileFolder}")
+    private String baseFileFolder ;
 
     private static final Integer limitNum = 50;
 
     private static final String chineseParentheses="（";
 
-//    private static final String FFMPEG_PATH = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
-    private static final String FFMPEG_PATH = "ffmpeg";
+//    private  static String ffmpegPath = "/home/pan/ffmpeg/linux/ffmpeg-4.2.2-amd64-static/ffmpeg";
 
+    @Value("${crawler.ffmpeg.path}")
+    private  String ffmpegPath;
+
+    @Value("${crawler.server.type}")
+    private  String serverType;
     // = "https://www.icourse163.org/course/PKU-1002530002";
+
 
     @Override
     public Result<Course> getCourseInfoBySchoolCourseId(String schoolCourseId) {
@@ -68,6 +75,14 @@ public class CrawlerServiceImpl implements CrawlerService {
             List<Term> termList = HtmlUtil.getTermByHtml(html);
             if (!CollectionUtils.isEmpty(termList)) {
                 c.setTermList(termList);
+                for (Term term : termList) {
+                    if (DataUtils.isNotNull(term)) {
+                        c.setId(term.getId());
+                        if (DataUtils.isNotNull(c.getId())) {
+                            break;
+                        }
+                    }
+                }
             }
         }
         rst.setObj(c);
@@ -77,16 +92,7 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Override
     public Result<Course> getCourseDetailByCourse(Course course) throws ScriptException {
         Result<Course> rst = new Result<>();
-        List<Term> termList = course.getTermList();
-        String tid = null;
-        for (Term term : termList) {
-            if (DataUtils.isNotNull(term)) {
-                tid = term.getId();
-                if (DataUtils.isNotNull(tid)) {
-                    break;
-                }
-            }
-        }
+        String  tid=course.getId();
         String sendPost = null;
         if (DataUtils.isNotNull(tid)) {
             String url = "https://www.icourse163.org/dwr/call/plaincall/CourseBean.getLastLearnedMocTermDto.dwr";
@@ -115,7 +121,7 @@ public class CrawlerServiceImpl implements CrawlerService {
             Object obj = engine.get("s0");
             // System.out.println(JSON.toJSONString(obj));
             c = JSON.parseObject(JSON.toJSONString(obj), Course.class);
-            c.setTermList(termList);
+            c.setTermList(course.getTermList());
             c.setCourseName(course.getCourseName());
             rst.setObj(c);
         } else {
@@ -241,42 +247,20 @@ public class CrawlerServiceImpl implements CrawlerService {
         return null;
     }
 
-    private static void toDownLoadTs(String baseUrl, List<String> tsList, File tempDirectory, File toDirectory, String videoName) {
+    private  void toDownLoadTs(String baseUrl, List<String> tsList, File tempDirectory, File toDirectory, String videoName) {
         List<String> filePaths = new ArrayList<>();
-        // StringBuilder sb = new StringBuilder();
-        // sb.append("cmd /c dir ");
-        // sb.append(FFMPEG_PATH);
-        // sb.append(" -i ");
-        // sb.append("\"concat:");
         for (String tsStr : tsList) {
             String allUrl = baseUrl + "/" + tsStr;
             File tsFile = new File(tempDirectory, tsStr);
             if (!tsFile.exists()) {
                 HttpRequest.downLoad(allUrl, tsFile);
-                // sb.append(tsFile.getAbsolutePath());
                 filePaths.add(tsFile.getAbsolutePath());
-                // sb.append("|");
             }
         }
         toMergeAllFile(filePaths, toDirectory, videoName);
-        // sb.append("\" -c copy ").append(file.getAbsolutePath());
-        // Process p = null;
-        // try {
-        // p = Runtime.getRuntime().exec(sb.toString());
-        // // ProcessBuilder builder = new ProcessBuilder("E:\\ffmpeg\\bin\\ffmpeg.exe",
-        // // "-i", "concat:",
-        // //
-        // "C:\\UMESPACE\\workspace\\crawler\\static\\file\\中国民族器乐经典_北京大学_中国大学MOOC(慕课)\\1215480489_63bfcd1d06bc4e0ab627e99b49c3603d_sd0.ts|C:\\UMESPACE\\workspace\\crawler\\static\\file\\中国民族器乐经典_北京大学_中国大学MOOC(慕课)\\1215480489_63bfcd1d06bc4e0ab627e99b49c3603d_sd1.ts|C:\\UMESPACE\\workspace\\crawler\\static\\file\\中国民族器乐经典_北京大学_中国大学MOOC(慕课)\\1215480489_63bfcd1d06bc4e0ab627e99b49c3603d_sd2.ts|",
-        // // "-c", "copy",
-        // //
-        // "C:\\UMESPACE\\workspace\\crawler\\static\\file\\中国民族器乐经典_北京大学_中国大学MOOC(慕课)\\01中国民族器乐经典第一季-1-开篇与聆听古筝.mp4");
-        // // p = builder.start();
-        // } catch (Exception e) {
-        // System.out.println(e.toString());
-        // }
     }
 
-    private static void toMergeAllFile(List<String> filePaths, File toDirectory, String videoName) {
+    private  void toMergeAllFile(List<String> filePaths, File toDirectory, String videoName) {
         if (filePaths.size() <= limitNum) {
             toCombine(toDirectory, filePaths, videoName);
         } else {
@@ -298,13 +282,13 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     }
 
-    private static String toCombine(File toDirectory, List<String> sub, String fileName) {
+    private  String toCombine(File toDirectory, List<String> sub, String fileName) {
         StringBuilder sb = new StringBuilder();
         File file = new File(toDirectory, fileName.replace(" ", "_"));
         if (file.exists()) {
             file.delete();
         }
-        sb.append(FFMPEG_PATH);
+        sb.append(ffmpegPath);
         sb.append(" -loglevel quiet ");
         sb.append(" -i ");
         sb.append("\"concat:");
@@ -315,8 +299,12 @@ public class CrawlerServiceImpl implements CrawlerService {
         sb.append("\" -c copy ").append(file.getAbsolutePath().replace(" ", "_"));
         Process p = null;
         try {
-//            p = Runtime.getRuntime().exec(new String[]{"sh", "-c", sb.toString()});
-            p = Runtime.getRuntime().exec(sb.toString());
+            if("linux".equals(serverType)){
+                p = Runtime.getRuntime().exec(new String[]{"sh", "-c", sb.toString()});
+            }else{
+                p = Runtime.getRuntime().exec(sb.toString());
+            }
+
             p.waitFor();
         } catch (Exception e) {
             System.out.println(e.toString());

@@ -13,6 +13,7 @@ import cn.l.x.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -31,9 +32,6 @@ public class CrawlerController {
     private static final String singlePattern = "[0-9|a-f|A-F]";
     // 4个字符的正则表达式
     private static final String pattern = singlePattern + singlePattern + singlePattern + singlePattern;
-
-    // FFmpeg全路径
-    private static final String FFMPEG_PATH = "ffmpeg";
 
     private static final Integer limitNum = 50;
 
@@ -74,6 +72,30 @@ public class CrawlerController {
         }
         return rst;
 
+    }
+
+    // 爬取视频
+    @RequestMapping("/crawlerCourseByCourse")
+    public Result crawlerCourseByCourse(@RequestBody Course cour, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Result<Course> rst = new Result<>();
+        // 获取课程详细信息
+            if (DataUtils.isNotNull(cour) && DataUtils.isNotNull(cour.getCourseName())) {
+                // 根据course基本信息获取详细信息
+                rst = crawlerService.getCourseDetailByCourse(cour);
+            } else {
+                rst.setCodeMsg(Messages.E0002);
+            }
+        // 下载信息
+        if (rst.isSucceeded()) {
+            Course course = rst.getObj();
+            if (DataUtils.isNotNull(course) && DataUtils.isNotNull(course.getCourseName()) && !CollectionUtils.isEmpty(course.getChapters())) {
+                // 根据课程详细信息下载相关文件
+                rst = crawlerService.downloadFileByCourse(course);
+            } else {
+                rst.setCodeMsg(Messages.E0002);
+            }
+        }
+        return rst;
     }
 
 }
