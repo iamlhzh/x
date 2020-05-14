@@ -54,6 +54,10 @@ public class CrawlerServiceImpl implements CrawlerService {
     private  String serverType;
     // = "https://www.icourse163.org/course/PKU-1002530002";
 
+    private final static String  WINDOWS_SERVER="windows";
+
+    private final static String  LINUX_SERVER="linux";
+
 
     @Override
     public Result<Course> getCourseInfoBySchoolCourseId(String schoolCourseId) {
@@ -132,12 +136,25 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     @Override
     public Result<Course> downloadFileByCourse(Course course) {
-        // 新建一个文件夹
-        String filePath = System.getProperty("user.dir");
-        File path = new File(filePath);
-        File baseDirectory = new File(path, baseFileFolder);
+        File baseDirectory;
+        File tempDirectory;
+        if(WINDOWS_SERVER.equals(serverType)){
+            String filePath = System.getProperty("user.dir");
+            System.out.println(filePath);
+            File path = new File(filePath);
+            System.out.println(path.getAbsolutePath());
+            if (!path.exists()) {
+                path = new File("");
+            }
+            // 设置文件路径
+            baseDirectory = new File(path.getAbsolutePath(), baseFileFolder);
+            tempDirectory = new File(path.getAbsolutePath(), baseTempFolder);
+        }else {
+            // 设置文件路径
+            baseDirectory = new File(baseFileFolder);
+            tempDirectory = new File(baseTempFolder);
+        }
         File courseDirectory = new File(baseDirectory, course.getCourseName());
-        File tempDirectory = new File(path, baseTempFolder);
         if(!tempDirectory.exists()){
             tempDirectory.mkdirs();
         }

@@ -11,6 +11,7 @@ import cn.l.x.dictionary.Messages;
 import cn.l.x.service.CrawlerService;
 import cn.l.x.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,9 @@ public class CrawlerController {
     private static final String pattern = singlePattern + singlePattern + singlePattern + singlePattern;
 
     private static final Integer limitNum = 50;
+
+    @Value("${crawler.server.type}")
+    private  String serverType;
 
     @Autowired
     private CrawlerService crawlerService;

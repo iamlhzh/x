@@ -16,6 +16,7 @@ public class FileInfo {
     private String fileAbsolutePath;
     private String fileRelativePath;
     private Boolean isDirectory;
+    private String suffix;
     private Long fileSize;
     private Date createTime;
     private Date updateTime;
@@ -59,6 +60,14 @@ public class FileInfo {
 
     public void setFileRelativePath(String fileRelativePath) {
         this.fileRelativePath = fileRelativePath;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 
     public Boolean getIsDirectory() {

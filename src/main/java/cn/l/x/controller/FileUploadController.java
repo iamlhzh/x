@@ -34,6 +34,13 @@ public class FileUploadController {
     @Value("${file.baseFileFolder}")
     private String baseFileFolder;
 
+    @Value("${crawler.server.type}")
+    private  String serverType;
+
+    private final static String  WINDOWS_SERVER="windows";
+
+    private final static String  LINUX_SERVER="linux";
+
     @ResponseBody
     @PostMapping(value = "/upLoadFile")
     public Result uploadFile(@RequestParam("fileDirectory") String fileDirectory, @RequestParam("filename") MultipartFile file) {
@@ -47,9 +54,27 @@ public class FileUploadController {
             System.out.println(file.getSize());
         }
         try {
-            String filePath = System.getProperty("user.dir");
-            File path = new File(filePath);
-            File baseDirectory = new File(path, baseFileFolder);
+//            String filePath = System.getProperty("user.dir");
+//            File path = new File(filePath);
+//            File baseDirectory = new File(path, baseFileFolder);
+            File baseDirectory;
+            if(WINDOWS_SERVER.equals(serverType)){
+                String filePath = System.getProperty("user.dir");
+                System.out.println(filePath);
+                File path = new File(filePath);
+                System.out.println(path.getAbsolutePath());
+                if (!path.exists()) {
+                    path = new File("");
+                }
+                // 设置文件路径
+                baseDirectory = new File(path.getAbsolutePath(), baseFileFolder);
+            }else {
+                // 设置文件路径
+                baseDirectory = new File(baseFileFolder);
+            }
+
+
+
             File toDirectory = new File(baseDirectory, fileDirectory);
 
             System.out.println(toDirectory.getAbsolutePath());
@@ -84,9 +109,26 @@ public class FileUploadController {
             System.out.println(fileList.length);
         }
         try {
-            String filePath = System.getProperty("user.dir");
-            File path = new File(filePath);
-            File baseDirectory = new File(path, baseFileFolder);
+//            String filePath = System.getProperty("user.dir");
+//            File path = new File(filePath);
+//            File baseDirectory = new File(path, baseFileFolder);
+            File baseDirectory;
+            if(WINDOWS_SERVER.equals(serverType)){
+                String filePath = System.getProperty("user.dir");
+                System.out.println(filePath);
+                File path = new File(filePath);
+                System.out.println(path.getAbsolutePath());
+                if (!path.exists()) {
+                    path = new File("");
+                }
+                // 设置文件路径
+                baseDirectory = new File(path.getAbsolutePath(), baseFileFolder);
+            }else {
+                // 设置文件路径
+                baseDirectory = new File(baseFileFolder);
+            }
+
+
             File toDirectory = new File(baseDirectory, fileDirectory);
 
             System.out.println(toDirectory.getAbsolutePath());
@@ -198,14 +240,27 @@ public class FileUploadController {
     public String downloadFile(String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String ip = getIpAddr(request);
         System.out.println(ip);
-        String filePath = System.getProperty("user.dir");
-        File path = new File(filePath);
-        if (!path.exists()) {
-            path = new File("");
-        }
         if (fileName != null) {
-            // 设置文件路径
-            File file = new File(path.getAbsolutePath(), baseFileFolder + fileName);
+//            String filePath = System.getProperty("user.dir");
+//            File path = new File(filePath);
+//            if (!path.exists()) {
+//                path = new File("");
+//            }
+            File file;
+            if(WINDOWS_SERVER.equals(serverType)){
+                String filePath = System.getProperty("user.dir");
+                System.out.println(filePath);
+                File path = new File(filePath);
+                System.out.println(path.getAbsolutePath());
+                if (!path.exists()) {
+                    path = new File("");
+                }
+                // 设置文件路径
+                file = new File(path.getAbsolutePath(), baseFileFolder);
+            }else {
+                // 设置文件路径
+                file = new File(baseFileFolder);
+            }
             if (file.exists()) {
                 response.setContentType("application/force-download");// 设置强制下载不打开
                 response.setHeader("Content-Length", "" + file.length());

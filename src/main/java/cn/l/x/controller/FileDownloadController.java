@@ -27,6 +27,9 @@ public class FileDownloadController {
     @Value("${file.baseFileFolder}")
     private String baseFileFolder;
 
+    @Value("${crawler.server.type}")
+    private  String serverType;
+
     // 文件下载相关代码
     @RequestMapping("/downfileByAbsolutePath")
     public String downfileByAbsolutePath(String fileAbsolutePath, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -43,62 +46,6 @@ public class FileDownloadController {
                 //
                 response.setContentType("multipart/form-data;charset=UTF-8");// 也可以明确的设置一下UTF-8，测试中不设置也可以。
                 response.setHeader("Content-Disposition", "attachment;fileName=" + new String(file.getName().getBytes("GB2312"), "ISO-8859-1"));
-                byte[] buffer = new byte[1024];
-                FileInputStream fis = null;
-                BufferedInputStream bis = null;
-                try {
-                    fis = new FileInputStream(file);
-                    bis = new BufferedInputStream(fis);
-                    OutputStream os = response.getOutputStream();
-                    int i = bis.read(buffer);
-                    while (i != -1) {
-                        os.write(buffer, 0, i);
-                        i = bis.read(buffer);
-                    }
-                    System.out.println("下载成功");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-        return "下载成功";
-    }
-
-    // 文件下载相关代码
-    @RequestMapping("/downfile")
-    public String downloadFile(String fileName, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String ip = getIpAddr(request);
-        System.out.println(ip);
-        String filePath = System.getProperty("user.dir");
-        File path = new File(filePath);
-        if (!path.exists()) {
-            path = new File("");
-        }
-        if (fileName != null) {
-            // 设置文件路径
-            File file = new File(path.getAbsolutePath(), baseFileFolder + fileName);
-            if (file.exists()) {
-                response.setContentType("application/force-download");// 设置强制下载不打开
-                response.setHeader("Content-Length", "" + file.length());
-                // response.addHeader("Content-Disposition", "attachment;fileName=" +
-                // fileName);// 设置文件名
-                // response.setContentType("multipart/form-data;charset=UTF-8");也可以明确的设置一下UTF-8，测试中不设置也可以。
-                response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes("GB2312"), "ISO-8859-1"));
                 byte[] buffer = new byte[1024];
                 FileInputStream fis = null;
                 BufferedInputStream bis = null;

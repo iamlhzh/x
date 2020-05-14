@@ -14,6 +14,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ch.qos.logback.core.util.FileUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +33,16 @@ public class FileListController {
     @Value("${file.baseFileFolder}")
     private String baseFileFolder;
 
+    @Value("${crawler.server.type}")
+    private  String serverType;
+
+    @Value("${server.domain}")
+    private  String serverDomain;
+
+    private final static String  WINDOWS_SERVER="windows";
+
+    private final static String  LINUX_SERVER="linux";
+
     /**
      * 获取文件目录树。
      * 
@@ -44,15 +57,21 @@ public class FileListController {
     public Result getDirectoryList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Result rst = new Result();
         String ip = getIpAddr(request);
-        String filePath = System.getProperty("user.dir");
-        System.out.println(filePath);
-        File path = new File(filePath);
-        System.out.println(path.getAbsolutePath());
-        if (!path.exists()) {
-            path = new File("");
+        File baseFile;
+        if(WINDOWS_SERVER.equals(serverType)){
+            String filePath = System.getProperty("user.dir");
+            System.out.println(filePath);
+            File path = new File(filePath);
+            System.out.println(path.getAbsolutePath());
+            if (!path.exists()) {
+                path = new File("");
+            }
+            // 设置文件路径
+            baseFile = new File(path.getAbsolutePath(), baseFileFolder);
+        }else {
+            // 设置文件路径
+            baseFile = new File(baseFileFolder);
         }
-        // 设置文件路径
-        File baseFile = new File(path.getAbsolutePath(), baseFileFolder);
         FileInfo resultFileInfo = getAllDirectoryTree(baseFile);
         List<FileInfo> returnList = new ArrayList<>();
         returnList.add(resultFileInfo);
@@ -106,13 +125,21 @@ public class FileListController {
         Result rst = new Result();
         String ip = getIpAddr(request);
         System.out.println(ip);
-        String filePath = System.getProperty("user.dir");
-        File path = new File(filePath);
-        if (!path.exists()) {
-            path = new File("");
+        File baseFile;
+        if(WINDOWS_SERVER.equals(serverType)){
+            String filePath = System.getProperty("user.dir");
+            System.out.println(filePath);
+            File path = new File(filePath);
+            System.out.println(path.getAbsolutePath());
+            if (!path.exists()) {
+                path = new File("");
+            }
+            // 设置文件路径
+            baseFile = new File(path.getAbsolutePath(), baseFileFolder);
+        }else {
+            // 设置文件路径
+            baseFile = new File(baseFileFolder);
         }
-        // 设置文件路径
-        File baseFile = new File(path.getAbsolutePath(), baseFileFolder);
         FileInfo resultFileInfo = getAllFileTree(baseFile);
         List<FileInfo> returnList = new ArrayList<>();
         returnList.add(resultFileInfo);
@@ -127,11 +154,22 @@ public class FileListController {
         resultFileInfo.setFileName(baseFile.getName());
         resultFileInfo.setIsDirectory(baseFile.isDirectory());
         resultFileInfo.setFileSize(baseFile.length());
-        resultFileInfo.setFileUrl(baseFile.getPath());
+        resultFileInfo.setFileAbsolutePath(baseFile.getAbsolutePath());
+        resultFileInfo.setFileUrl(serverDomain+baseFile.getName());
+        if(!baseFile.isDirectory()){
+            resultFileInfo.setSuffix(getFileSufix(baseFile.getName()));
+        }
         if (resultFileInfo.getIsDirectory()) {
             getSubFile(resultFileInfo);
         }
         return resultFileInfo;
+    }
+
+    public static String getFileSufix(String fileName) {
+        if(fileName == null || "".equals(fileName)){
+            return null;
+        }
+        return fileName.substring(fileName.lastIndexOf(".")+1);//从最后一个点之后截取字符串
     }
 
     private void getSubFile(FileInfo resultFileInfo) {
@@ -144,6 +182,10 @@ public class FileListController {
             fileInfo.setIsDirectory(file.isDirectory());
             fileInfo.setFileSize(file.length());
             fileInfo.setFileAbsolutePath(file.getAbsolutePath());
+            fileInfo.setFileUrl(resultFileInfo.getFileUrl()+"/"+file.getName());
+            if(!file.isDirectory()){
+                fileInfo.setSuffix(getFileSufix(file.getName()));
+            }
             fileList.add(fileInfo);
         }
         resultFileInfo.setChildrenFileList(fileList);
