@@ -224,4 +224,49 @@ public class FileListController {
         return ipAddress;
     }
 
+    @ResponseBody
+    @RequestMapping("/getDirectFileList")
+    public Result getDirectFileList(HttpServletRequest request, HttpServletResponse response,String fileFolder) throws Exception {
+        Result rst = new Result();
+        String ip = getIpAddr(request);
+        System.out.println(ip);
+        File baseFile;
+        if(WINDOWS_SERVER.equals(serverType)){
+            String filePath = System.getProperty("user.dir");
+            System.out.println(filePath);
+            File path = new File(filePath);
+            System.out.println(path.getAbsolutePath());
+            if (!path.exists()) {
+                path = new File("");
+            }
+            // 设置文件路径
+            baseFile = new File(path.getAbsolutePath(), fileFolder);
+        }else {
+            // 设置文件路径
+            baseFile = new File(fileFolder);
+        }
+        List<FileInfo> returnList = getAllDirectFile(baseFile);
+        rst.setObj(returnList);
+        return rst;
+    }
+
+    private List<FileInfo> getAllDirectFile(File baseFile) {
+        File[] listFiles = baseFile.listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+        for (File file : listFiles) {
+            FileInfo fileInfo = new FileInfo();
+            fileInfo.setFile(file);
+            fileInfo.setFileName(file.getName());
+            fileInfo.setIsDirectory(file.isDirectory());
+            fileInfo.setFileSize(file.length());
+            fileInfo.setFileAbsolutePath(file.getAbsolutePath());
+            fileInfo.setFileUrl(serverDomain+baseFile.getPath()+"/"+file.getName());
+            if(!file.isDirectory()){
+                fileInfo.setSuffix(getFileSufix(file.getName()));
+            }
+            fileList.add(fileInfo);
+        }
+        return fileList;
+    }
+
 }
