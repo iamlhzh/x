@@ -14,9 +14,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ch.qos.logback.core.util.FileUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -34,14 +31,14 @@ public class FileListController {
     private String baseFileFolder;
 
     @Value("${crawler.server.type}")
-    private  String serverType;
+    private String serverType;
 
     @Value("${server.domain}")
-    private  String serverDomain;
+    private String serverDomain;
 
-    private final static String  WINDOWS_SERVER="windows";
+    private final static String WINDOWS_SERVER = "windows";
 
-    private final static String  LINUX_SERVER="linux";
+    private final static String LINUX_SERVER = "linux";
 
     /**
      * 获取文件目录树。
@@ -58,7 +55,7 @@ public class FileListController {
         Result rst = new Result();
         String ip = getIpAddr(request);
         File baseFile;
-        if(WINDOWS_SERVER.equals(serverType)){
+        if (WINDOWS_SERVER.equals(serverType)) {
             String filePath = System.getProperty("user.dir");
             System.out.println(filePath);
             File path = new File(filePath);
@@ -68,7 +65,7 @@ public class FileListController {
             }
             // 设置文件路径
             baseFile = new File(path.getAbsolutePath(), baseFileFolder);
-        }else {
+        } else {
             // 设置文件路径
             baseFile = new File(baseFileFolder);
         }
@@ -126,7 +123,7 @@ public class FileListController {
         String ip = getIpAddr(request);
         System.out.println(ip);
         File baseFile;
-        if(WINDOWS_SERVER.equals(serverType)){
+        if (WINDOWS_SERVER.equals(serverType)) {
             String filePath = System.getProperty("user.dir");
             System.out.println(filePath);
             File path = new File(filePath);
@@ -136,7 +133,7 @@ public class FileListController {
             }
             // 设置文件路径
             baseFile = new File(path.getAbsolutePath(), baseFileFolder);
-        }else {
+        } else {
             // 设置文件路径
             baseFile = new File(baseFileFolder);
         }
@@ -155,8 +152,8 @@ public class FileListController {
         resultFileInfo.setIsDirectory(baseFile.isDirectory());
         resultFileInfo.setFileSize(baseFile.length());
         resultFileInfo.setFileAbsolutePath(baseFile.getAbsolutePath());
-        resultFileInfo.setFileUrl(serverDomain+baseFile.getName());
-        if(!baseFile.isDirectory()){
+        resultFileInfo.setFileUrl(serverDomain + baseFile.getName());
+        if (!baseFile.isDirectory()) {
             resultFileInfo.setSuffix(getFileSufix(baseFile.getName()));
         }
         if (resultFileInfo.getIsDirectory()) {
@@ -166,10 +163,10 @@ public class FileListController {
     }
 
     public static String getFileSufix(String fileName) {
-        if(fileName == null || "".equals(fileName)){
+        if (fileName == null || "".equals(fileName)) {
             return null;
         }
-        return fileName.substring(fileName.lastIndexOf(".")+1);//从最后一个点之后截取字符串
+        return fileName.substring(fileName.lastIndexOf(".") + 1);// 从最后一个点之后截取字符串
     }
 
     private void getSubFile(FileInfo resultFileInfo) {
@@ -182,8 +179,8 @@ public class FileListController {
             fileInfo.setIsDirectory(file.isDirectory());
             fileInfo.setFileSize(file.length());
             fileInfo.setFileAbsolutePath(file.getAbsolutePath());
-            fileInfo.setFileUrl(resultFileInfo.getFileUrl()+"/"+file.getName());
-            if(!file.isDirectory()){
+            fileInfo.setFileUrl(resultFileInfo.getFileUrl() + "/" + file.getName());
+            if (!file.isDirectory()) {
                 fileInfo.setSuffix(getFileSufix(file.getName()));
             }
             fileList.add(fileInfo);
@@ -226,31 +223,35 @@ public class FileListController {
 
     @ResponseBody
     @RequestMapping("/getDirectFileList")
-    public Result getDirectFileList(HttpServletRequest request, HttpServletResponse response,String fileFolder) throws Exception {
+    public Result getDirectFileList(HttpServletRequest request, HttpServletResponse response, String fileFolder) throws Exception {
         Result rst = new Result();
         String ip = getIpAddr(request);
         System.out.println(ip);
         File baseFile;
-        if(WINDOWS_SERVER.equals(serverType)){
+        File playBaseFile;
+        if (WINDOWS_SERVER.equals(serverType)) {
             String filePath = System.getProperty("user.dir");
             System.out.println(filePath);
-            File path = new File(filePath);
+            File path = new File(filePath, baseFileFolder);
             System.out.println(path.getAbsolutePath());
             if (!path.exists()) {
                 path = new File("");
             }
             // 设置文件路径
             baseFile = new File(path.getAbsolutePath(), fileFolder);
-        }else {
+            playBaseFile = new File(path.getAbsolutePath(), fileFolder);
+        } else {
             // 设置文件路径
-            baseFile = new File(fileFolder);
+            baseFile = new File(baseFileFolder, fileFolder);
+            playBaseFile = new File("file/", fileFolder);
+
         }
-        List<FileInfo> returnList = getAllDirectFile(baseFile);
+        List<FileInfo> returnList = getAllDirectFile(baseFile, playBaseFile);
         rst.setObj(returnList);
         return rst;
     }
 
-    private List<FileInfo> getAllDirectFile(File baseFile) {
+    private List<FileInfo> getAllDirectFile(File baseFile, File playBaseFile) {
         File[] listFiles = baseFile.listFiles();
         List<FileInfo> fileList = new ArrayList<>();
         for (File file : listFiles) {
@@ -260,8 +261,8 @@ public class FileListController {
             fileInfo.setIsDirectory(file.isDirectory());
             fileInfo.setFileSize(file.length());
             fileInfo.setFileAbsolutePath(file.getAbsolutePath());
-            fileInfo.setFileUrl(serverDomain+baseFile.getPath()+"/"+file.getName());
-            if(!file.isDirectory()){
+            fileInfo.setFileUrl(serverDomain + playBaseFile.getPath() + "/" + file.getName());
+            if (!file.isDirectory()) {
                 fileInfo.setSuffix(getFileSufix(file.getName()));
             }
             fileList.add(fileInfo);
