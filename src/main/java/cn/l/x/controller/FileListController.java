@@ -239,13 +239,16 @@ public class FileListController {
             }
             // 设置文件路径
             baseFile = new File(path.getAbsolutePath(), fileFolder);
-            playBaseFile = new File(path.getAbsolutePath(), fileFolder);
+            playBaseFile = new File(fileFolder);
         } else {
             // 设置文件路径
             baseFile = new File(baseFileFolder, fileFolder);
             playBaseFile = new File("file/", fileFolder);
 
         }
+        System.out.println("serverType:"+serverType);
+        System.out.println("baseFileFolder:"+baseFileFolder);
+        System.out.println("serverDomain:"+serverDomain);
         List<FileInfo> returnList = getAllDirectFile(baseFile, playBaseFile);
         rst.setObj(returnList);
         return rst;
