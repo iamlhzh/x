@@ -159,7 +159,9 @@ public class HtmlUtil {
     }
 
     public static List<School> getSchoolList(String sendGet) {
-        String reg = "<a[\\s]*class=\"u-usity[\\s]*f-fl\"[\\s\\S\n]*?</a>";
+//        String reg = "<a[\\s]*class=\"u-usity[\\s]*f-fl\"[\\s\\S\n]*?</a>";
+        String reg = "<a\\s+(?:[^>]*\\s+)?class=\"(?:.*?\\s+)?u-usity(?:\\s+.*?)?f-fl(?:\\s+.*?)?\"[^>]*>(.*?)</a>";
+
         List<School> schoolList = new ArrayList<>();
         Matcher m = Pattern.compile(reg).matcher(sendGet);
         System.out.println(m.groupCount());
