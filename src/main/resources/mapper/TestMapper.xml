@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.l.x.course.dao.TestDao" >
 	<insert id="add" parameterType="cn.l.x.course.bean.Test">
-		INSERT INTO `pl_enzyme`.`test` (`id`, `name`) VALUES (#{id}, #{name})
+		INSERT INTO `test` (`id`, `name`) VALUES (#{id}, #{name})
 	</insert>
 	
 	<insert id="addAdminUser" parameterType="cn.l.x.course.bean.AdminUser">
-		INSERT INTO `pl_enzyme`.`tb_admin_user` (`id`, `login_name`,`real_name`) VALUES (#{id}, #{loginName},#{realName})
+		INSERT INTO `tb_admin_user` (`id`, `login_name`,`real_name`) VALUES (#{id}, #{loginName},#{realName})
 	</insert>
 	
 </mapper>

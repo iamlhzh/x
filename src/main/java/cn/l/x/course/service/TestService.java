@@ -14,4 +14,5 @@ public interface TestService {
 
     void addAdminUser(AdminUser adu);
 
+    void addAdminUser2(AdminUser adu);
 }

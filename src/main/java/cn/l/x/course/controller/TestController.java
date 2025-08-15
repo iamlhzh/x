@@ -173,7 +173,7 @@ public class TestController {
         adu.setId("11");
         adu.setLoginName("lhzh");
         adu.setRealName("卢宏政");
-        testService.addAdminUser(adu);
+        testService.addAdminUser2(adu);
         return "OK";
     }
 

@@ -13,6 +13,7 @@ import cn.l.x.course.service.CourseService;
 import cn.l.x.course.service.CrawlerService;
 import cn.l.x.course.service.SchoolService;
 import cn.l.x.common.utils.DataUtils;
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/course")
 public class CourseController {
 
+    private static Logger logger = Logger.getLogger(CourseController.class);
+
     @Autowired
     private CourseService courseService;
 
@@ -40,6 +43,7 @@ public class CourseController {
 
     @RequestMapping("/getAllCourse")
     public Result getAllCourse(@RequestBody SchoolCourseQuery SchoolCourseQuery, HttpServletRequest request, HttpServletResponse response) {
+        logger.info("getAllCourse");
         System.out.println(SchoolCourseQuery);
         String url=HOSTURL+SchoolCourseQuery.getAbbreviation();
         String schoolId=schoolService.getSchoolIdByAbbreviation(url);
